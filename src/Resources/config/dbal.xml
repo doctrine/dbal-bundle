@@ -14,9 +14,6 @@
         <parameter key="doctrine.dbal.connection_factory.class">Doctrine\Bundle\DoctrineBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
-        <parameter key="doctrine.class">Doctrine\Bundle\DoctrineBundle\Registry</parameter>
-        <parameter key="doctrine.entity_managers" type="collection"></parameter>
-        <parameter key="doctrine.default_entity_manager"></parameter>
     </parameters>
 
     <services>
@@ -56,15 +53,6 @@
         </service>
 
         <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
-
-        <service id="doctrine" class="%doctrine.class%" public="true">
-            <argument type="service" id="service_container" />
-            <argument>%doctrine.connections%</argument>
-            <argument>%doctrine.entity_managers%</argument>
-            <argument>%doctrine.default_connection%</argument>
-            <argument>%doctrine.default_entity_manager%</argument>
-        </service>
-        <service id="Doctrine\Common\Persistence\ManagerRegistry" alias="doctrine" public="false" />
 
         <service id="doctrine.twig.doctrine_extension" class="Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension" public="false">
             <tag name="twig.extension" />

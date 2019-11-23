@@ -1,0 +1,39 @@
+{
+    "name": "doctrine/dbal-bundle",
+    "type": "symfony-bundle",
+    "description": "Integration bundle for Doctrine DBAL",
+    "keywords": ["DBAL", "Database"],
+    "homepage": "http://www.doctrine-project.org",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Doctrine Project",
+            "homepage": "http://www.doctrine-project.org/"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "symfony/http-kernel": "^3.4.30|^4.3.3|^5.0"
+    },
+    "require-dev": {
+        "doctrine/coding-standard": "^6.0",
+        "phpunit/phpunit": "^7.5 || ^8.4",
+        "symfony/phpunit-bridge": "^5.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "conflict": {
+        "doctrine/orm": "<2.6",
+        "twig/twig": "<1.34|>=2.0,<2.4"
+    },
+    "autoload": {
+        "psr-4": { "Doctrine\\Bundle\\DBALBundle\\": "src" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

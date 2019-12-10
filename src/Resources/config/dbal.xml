@@ -11,7 +11,7 @@
         <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
         <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
         <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
-        <parameter key="doctrine.dbal.connection_factory.class">Doctrine\Bundle\DoctrineBundle\ConnectionFactory</parameter>
+        <parameter key="doctrine.dbal.connection_factory.class">Doctrine\Bundle\DBALBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
         <parameter key="doctrine.dbal.events.oracle_session_init.class">Doctrine\DBAL\Event\Listeners\OracleSessionInit</parameter>
     </parameters>
@@ -27,7 +27,7 @@
         </service>
 
         <service id="doctrine.dbal.logger.profiling" class="%doctrine.dbal.logger.profiling.class%" public="false" abstract="true" />
-        <service id="doctrine.dbal.logger.backtrace" class="Doctrine\Bundle\DoctrineBundle\Dbal\Logging\BacktraceLogger" public="false" abstract="true" />
+        <service id="doctrine.dbal.logger.backtrace" class="Doctrine\Bundle\DBALBundle\Dbal\Logging\BacktraceLogger" public="false" abstract="true" />
 
         <service id="doctrine.dbal.logger" class="%doctrine.dbal.logger.class%" public="false">
             <tag name="monolog.logger" channel="doctrine" />
@@ -54,19 +54,19 @@
 
         <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
 
-        <service id="doctrine.twig.doctrine_extension" class="Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension" public="false">
+        <service id="doctrine.twig.doctrine_extension" class="Doctrine\Bundle\DBALBundle\Twig\DoctrineExtension" public="false">
             <tag name="twig.extension" />
         </service>
 
-        <service id="doctrine.dbal.schema_asset_filter_manager" class="Doctrine\Bundle\DoctrineBundle\Dbal\SchemaAssetsFilterManager" public="false" abstract="true">
+        <service id="doctrine.dbal.schema_asset_filter_manager" class="Doctrine\Bundle\DBALBundle\DBAL\SchemaFilter\SchemaAssetsFilterManager" public="false" abstract="true">
             <!-- schema assets filters -->
         </service>
 
-        <service id="doctrine.dbal.well_known_schema_asset_filter" class="Doctrine\Bundle\DoctrineBundle\Dbal\BlacklistSchemaAssetFilter" public="false">
+        <service id="doctrine.dbal.well_known_schema_asset_filter" class="Doctrine\Bundle\DBALBundle\DBAL\SchemaFilter\BlacklistSchemaAssetFilter" public="false">
             <argument type="collection" />
         </service>
 
-        <!-- commands -->
+        <!-- commands
         <service id="doctrine.database_create_command" class="Doctrine\Bundle\DoctrineBundle\Command\CreateDatabaseDoctrineCommand">
             <argument type="service" id="doctrine" />
 
@@ -86,6 +86,7 @@
         <service id="doctrine.query_sql_command" class="Doctrine\Bundle\DoctrineBundle\Command\Proxy\RunSqlDoctrineCommand">
             <tag name="console.command" command="doctrine:query:sql" />
         </service>
+        -->
 
     </services>
 </container>

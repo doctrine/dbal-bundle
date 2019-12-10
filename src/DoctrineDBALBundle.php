@@ -2,18 +2,8 @@
 
 namespace Doctrine\Bundle\DBALBundle;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass;
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\WellKnownSchemaFilterPass;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Proxy\Autoloader;
-use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\DoctrineValidationPass;
-use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
-use Symfony\Bridge\Doctrine\DependencyInjection\Security\UserProvider\EntityFactory;
-use Symfony\Component\Console\Application;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Doctrine\Bundle\DBALBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
+use Doctrine\Bundle\DBALBundle\DependencyInjection\Compiler\WellKnownSchemaFilterPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -22,7 +12,30 @@ class DoctrineDBALBundle extends Bundle
     /**
      * {@inheritDoc}
      */
-    public function registerCommands(Application $application)
+    public function build(ContainerBuilder $container)
     {
+        parent::build($container);
+        $container->addCompilerPass(new WellKnownSchemaFilterPass());
+        $container->addCompilerPass(new DbalSchemaFilterPass());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function shutdown()
+    {
+        // Close all connections to avoid reaching too many connections in the process when booting again later (tests)
+        if (! $this->container->hasParameter('doctrine.connections')) {
+            return;
+        }
+
+        // TODO: use ConnectionRegistry?
+        foreach ($this->container->getParameter('doctrine.connections') as $id) {
+            if (! $this->container->initialized($id)) {
+                continue;
+            }
+
+            $this->container->get($id)->close();
+        }
     }
 }

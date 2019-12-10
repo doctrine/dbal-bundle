@@ -80,6 +80,7 @@ class DoctrineDBALDataCollector extends DataCollector
 
     public function getConnections()
     {
+        //TODO: this needs a ConnectionRegistry
         return [];
     }
 

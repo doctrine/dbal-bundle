@@ -76,9 +76,9 @@
     {% set profiler_markup_version = profiler_markup_version|default(1) %}
 
     {% if 'explain' == page %}
-        {{ render(controller('DoctrineBundle:Profiler:explain', {
+        {{ render(controller('Doctrine\\Bundle\\DBALBundle\\Controller\\ProfilerController::explainAction', {
             token: token,
-            panel: 'db',
+            panel: 'doctrine.dbal',
             connectionName: request.query.get('connection'),
             query: request.query.get('query')
         })) }}
@@ -134,10 +134,10 @@
     {% set group_queries = request.query.getBoolean('group') %}
     {% if group_queries %}
         <h2>Grouped Statements</h2>
-        <p><a href="{{ path('_profiler', { panel: 'db', token: token }) }}">Show all queries</a></p>
+        <p><a href="{{ path('_profiler', { panel: 'doctrine.dbal', token: token }) }}">Show all queries</a></p>
     {% else %}
         <h2>Queries</h2>
-        <p><a href="{{ path('_profiler', { panel: 'db', token: token, group: true }) }}">Group similar statements</a></p>
+        <p><a href="{{ path('_profiler', { panel: 'doctrine.dbal', token: token, group: true }) }}">Group similar statements</a></p>
     {% endif %}
 
     {% for connection, queries in collector.queries %}
@@ -197,7 +197,7 @@
 
                                 {% if query.explainable %}
                                     &nbsp;&nbsp;
-                                    <a class="link-inverse" href="{{ path('_profiler', { panel: 'db', token: token, page: 'explain', connection: connection, query: i }) }}" onclick="return explain(this);" data-target-id="explain-{{ i }}-{{ loop.parent.loop.index }}">Explain query</a>
+                                    <a class="link-inverse" href="{{ path('_profiler', { panel: 'doctrine.dbal', token: token, page: 'explain', connection: connection, query: i }) }}" onclick="return explain(this);" data-target-id="explain-{{ i }}-{{ loop.parent.loop.index }}">Explain query</a>
                                 {% endif %}
 
                                 {% if query.backtrace is defined %}

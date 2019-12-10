@@ -89,7 +89,7 @@ class DoctrineDBALExtension extends Extension
             $profilingLoggerId = $profilingAbstractId . '.' . $name;
             $container->setDefinition($profilingLoggerId, new ChildDefinition($profilingAbstractId));
             $profilingLogger = new Reference($profilingLoggerId);
-            $container->getDefinition('data_collector.doctrine')->addMethodCall('addLogger', [$name, $profilingLogger]);
+            $container->getDefinition('data_collector.doctrine.dbal')->addMethodCall('addLogger', [$name, $profilingLogger]);
 
             if ($logger !== null) {
                 $chainLogger = new ChildDefinition('doctrine.dbal.logger.chain');

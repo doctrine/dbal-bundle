@@ -9,7 +9,7 @@
         <parameter key="doctrine.dbal.logger.profiling.class">Doctrine\DBAL\Logging\DebugStack</parameter>
         <parameter key="doctrine.dbal.logger.class">Symfony\Bridge\Doctrine\Logger\DbalLogger</parameter>
         <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
-        <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
+        <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DBALBundle\DataCollector\DoctrineDBALDataCollector</parameter>
         <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
         <parameter key="doctrine.dbal.connection_factory.class">Doctrine\Bundle\DBALBundle\ConnectionFactory</parameter>
         <parameter key="doctrine.dbal.events.mysql_session_init.class">Doctrine\DBAL\Event\Listeners\MysqlSessionInit</parameter>
@@ -35,9 +35,8 @@
             <argument type="service" id="debug.stopwatch" on-invalid="null" />
         </service>
 
-        <service id="data_collector.doctrine" class="%doctrine.data_collector.class%" public="false">
-            <tag name="data_collector" template="@Doctrine/Collector/db.html.twig" id="db" priority="250" />
-            <argument type="service" id="doctrine" />
+        <service id="data_collector.doctrine.dbal" class="%doctrine.data_collector.class%" public="false">
+            <tag name="data_collector" template="@DoctrineDBAL/Collector/panel.html.twig" id="doctrine.dbal" priority="250" />
         </service>
 
         <service id="doctrine.dbal.connection_factory" class="%doctrine.dbal.connection_factory.class%">
@@ -54,7 +53,7 @@
 
         <service id="doctrine.dbal.connection.configuration" class="%doctrine.dbal.configuration.class%" public="false" abstract="true" />
 
-        <service id="doctrine.twig.doctrine_extension" class="Doctrine\Bundle\DBALBundle\Twig\DoctrineExtension" public="false">
+        <service id="doctrine.twig.doctrine_extension" class="Doctrine\Bundle\DBALBundle\Twig\DoctrineDBALExtension" public="false">
             <tag name="twig.extension" />
         </service>
 

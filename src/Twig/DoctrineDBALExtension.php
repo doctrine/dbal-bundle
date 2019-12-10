@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Bundle\DoctrineBundle\Twig;
+namespace Doctrine\Bundle\DBALBundle\Twig;
 
 use SqlFormatter;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -344,6 +344,6 @@ class DoctrineDBALExtension extends AbstractExtension
      */
     public function getName()
     {
-        return 'doctrine_extension';
+        return 'doctrine_dbal_extension';
     }
 }

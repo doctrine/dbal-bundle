@@ -6,6 +6,7 @@ use Doctrine\Bundle\DBALBundle\DBAL\RegexSchemaAssetFilter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -63,6 +64,15 @@ class DoctrineDBALExtension extends Extension
         foreach ($config['connections'] as $name => $connection) {
             $this->loadDbalConnection($name, $connection, $container);
         }
+
+        $registry = $container->getDefinition('doctrine.dbal.connection_registry');
+        $registry->setArguments([
+            ServiceLocatorTagPass::register($container,  array_map(function($id) {
+                return new Reference($id);
+            }, $connections)),
+            $defaultConnection,
+            array_keys($connections),
+        ]);
     }
 
         /**

@@ -57,8 +57,9 @@ class ProfilerController implements ContainerAwareInterface
         }
 
         /** @var Connection $connection */
-        //TODO: this needs ConnectionRegistry
-        $connection = $this->container->get('doctrine')->getConnection($connectionName);
+
+        //TODO: make service private and use DI
+        $connection = $this->container->get('doctrine.dbal.connection_registry')->getConnection($connectionName);
         try {
             $platform = $connection->getDatabasePlatform();
             if ($platform instanceof SqlitePlatform) {

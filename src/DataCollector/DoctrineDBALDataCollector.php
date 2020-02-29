@@ -2,6 +2,7 @@
 
 namespace Doctrine\Bundle\DBALBundle\DataCollector;
 
+use Doctrine\Bundle\DBALBundle\ConnectionRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
@@ -23,6 +24,22 @@ class DoctrineDBALDataCollector extends DataCollector
     private $loggers = [];
 
     /**
+     * @var ConnectionRegistry
+     */
+    private $connectionRegistry;
+
+    /**
+     * @var array
+     */
+    private $connectionServiceIds;
+
+    public function __construct(ConnectionRegistry $connectionRegistry, array $connectionServiceIds)
+    {
+        $this->connectionRegistry = $connectionRegistry;
+        $this->connectionServiceIds = $connectionServiceIds;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
@@ -34,6 +51,7 @@ class DoctrineDBALDataCollector extends DataCollector
 
         $this->data = [
             'queries' => $queries,
+            'connections' => $this->connectionServiceIds,
         ];
 
         // Might be good idea to replicate this block in doctrine bridge so we can drop this from here after some time.
@@ -80,8 +98,7 @@ class DoctrineDBALDataCollector extends DataCollector
 
     public function getConnections()
     {
-        //TODO: this needs a ConnectionRegistry
-        return [];
+        return $this->data['connections'];
     }
 
     public function getQueryCount()
@@ -200,15 +217,14 @@ class DoctrineDBALDataCollector extends DataCollector
                 if ($type instanceof Type) {
                     $query['types'][$j] = $type->getBindingType();
                     try {
-                        //TODO: this needs a ConnectionRegistry
-                        //$param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
+                        $param = $type->convertToDatabaseValue($param, $this->connectionRegistry->getConnection($connectionName)->getDatabasePlatform());
                     } catch (\TypeError $e) {
                     } catch (ConversionException $e) {
                     }
                 }
             }
 
-            list($query['params'][$j], $explainable, $runnable) = $this->sanitizeParam($param, $e);
+            [$query['params'][$j], $explainable, $runnable] = $this->sanitizeParam($param, $e);
             if (!$explainable) {
                 $query['explainable'] = false;
             }
@@ -244,7 +260,7 @@ class DoctrineDBALDataCollector extends DataCollector
             $a = [];
             $explainable = $runnable = true;
             foreach ($var as $k => $v) {
-                list($value, $e, $r) = $this->sanitizeParam($v, null);
+                [$value, $e, $r] = $this->sanitizeParam($v, null);
                 $explainable = $explainable && $e;
                 $runnable = $runnable && $r;
                 $a[$k] = $value;

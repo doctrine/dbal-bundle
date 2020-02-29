@@ -37,6 +37,11 @@
 
         <service id="data_collector.doctrine.dbal" class="%doctrine.data_collector.class%" public="false">
             <tag name="data_collector" template="@DoctrineDBAL/Collector/panel.html.twig" id="doctrine.dbal" priority="250" />
+            <argument type="service" id="doctrine.dbal.connection_registry" />
+            <argument>%doctrine.connections%</argument>
+        </service>
+
+        <service id="doctrine.dbal.connection_registry" class="Doctrine\Bundle\DBALBundle\Psr11ConnectionRegistry" public="true">
         </service>
 
         <service id="doctrine.dbal.connection_factory" class="%doctrine.dbal.connection_factory.class%">

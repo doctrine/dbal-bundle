@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Bundle\DoctrineBundle\Tests;
+namespace Doctrine\Bundle\DBALBundle\Tests;
 
 use Doctrine\Bundle\DBALBundle\DependencyInjection\Compiler\DbalSchemaFilterPass;
 use Doctrine\Bundle\DBALBundle\DoctrineDBALBundle;

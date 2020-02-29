@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Bundle\DoctrineBundle\Tests\DataCollector;
+namespace Doctrine\Bundle\DBALBundle\Tests\DataCollector;
 
 use Doctrine\Bundle\DBALBundle\ConnectionRegistry;
 use Doctrine\Bundle\DBALBundle\DataCollector\DoctrineDBALDataCollector;

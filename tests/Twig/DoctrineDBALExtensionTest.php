@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Bundle\DoctrineBundle\Tests\Twig;
+namespace Doctrine\Bundle\DBALBundle\Tests\Twig;
 
 use Doctrine\Bundle\DBALBundle\Twig\DoctrineDBALExtension;
 use PHPUnit\Framework\TestCase;

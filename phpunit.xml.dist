@@ -7,7 +7,6 @@
          colors="true"
          bootstrap="vendor/autoload.php"
          failOnRisky="true"
-         failOnWarning="true"
 >
     <testsuites>
         <testsuite name="Doctrine DBAL Bundle Test Suite">

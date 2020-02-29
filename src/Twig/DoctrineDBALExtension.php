@@ -296,7 +296,7 @@ class DoctrineDBALExtension extends AbstractExtension
                 }
 
                 $value  = array_key_exists($i, $parameters) ? $parameters[$i] : $parameters[$key];
-                $result = DoctrineExtension::escapeFunction($value);
+                $result = self::escapeFunction($value);
                 $i++;
 
                 return $result;

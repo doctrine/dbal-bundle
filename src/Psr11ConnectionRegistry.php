@@ -7,39 +7,45 @@ use Psr\Container\ContainerInterface;
 
 class Psr11ConnectionRegistry implements ConnectionRegistry
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $defaultConnectionName;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     private $connectionNames;
 
+    /**
+     * @param string[] $connectionNames
+     */
     public function __construct(ContainerInterface $container, string $defaultConnectionName, array $connectionNames)
     {
-        $this->container = $container;
+        $this->container             = $container;
         $this->defaultConnectionName = $defaultConnectionName;
-        $this->connectionNames = $connectionNames;
+        $this->connectionNames       = $connectionNames;
     }
 
-    public function getDefaultConnectionName(): string
+    /**
+     * @inheritDoc
+     */
+    public function getDefaultConnectionName() : string
     {
         return $this->defaultConnectionName;
     }
 
-    public function getConnection(?string $name = null): Connection
+    /**
+     * @inheritDoc
+     */
+    public function getConnection(?string $name = null) : Connection
     {
         return $this->container->get($name !== null ? $name : $this->defaultConnectionName);
     }
 
-    public function getConnections(): array
+    /**
+     * @inheritDoc
+     */
+    public function getConnections() : array
     {
         $connections = [];
 
@@ -50,7 +56,10 @@ class Psr11ConnectionRegistry implements ConnectionRegistry
         return $connections;
     }
 
-    public function getConnectionNames(): array
+    /**
+     * @inheritDoc
+     */
+    public function getConnectionNames() : array
     {
         return $this->connectionNames;
     }

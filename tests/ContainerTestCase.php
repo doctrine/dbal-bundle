@@ -46,7 +46,8 @@ abstract class ContainerTestCase extends BaseTestCase
                     'commented' => false,
                 ],
             ],
-        ]], $container);
+        ],
+        ], $container);
 
         $container->setDefinition('my.platform', new Definition('Doctrine\DBAL\Platforms\MySqlPlatform'))->setPublic(true);
 

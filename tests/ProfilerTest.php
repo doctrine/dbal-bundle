@@ -32,10 +32,10 @@ class ProfilerTest extends BaseTestCase
     /** @var DoctrineDBALDataCollector */
     private $collector;
 
-    public function setUp(): void
+    public function setUp() : void
     {
-        $this->logger = new DebugStack();
-        $registry     = $this->createMock(ConnectionRegistry::class);
+        $this->logger    = new DebugStack();
+        $registry        = $this->createMock(ConnectionRegistry::class);
         $this->collector = new DoctrineDBALDataCollector($registry, []);
         $this->collector->addLogger('foo', $this->logger);
 

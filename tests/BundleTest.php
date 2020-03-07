@@ -18,7 +18,7 @@ class BundleTest extends TestCase
         $config = $container->getCompilerPassConfig();
         $passes = $config->getBeforeOptimizationPasses();
 
-        $foundSchemaFilter  = false;
+        $foundSchemaFilter = false;
 
         foreach ($passes as $pass) {
             if ($pass instanceof DbalSchemaFilterPass) {

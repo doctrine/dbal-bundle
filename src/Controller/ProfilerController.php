@@ -16,9 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 //TODO: refactor and make this controller a service?
 class ProfilerController implements ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     private $container;
 
     /**

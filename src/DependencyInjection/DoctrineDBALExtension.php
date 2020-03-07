@@ -19,7 +19,7 @@ class DoctrineDBALExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $this->dbalLoad($config, $container);
     }
@@ -67,7 +67,7 @@ class DoctrineDBALExtension extends Extension
 
         $registry = $container->getDefinition('doctrine.dbal.connection_registry');
         $registry->setArguments([
-            ServiceLocatorTagPass::register($container,  array_map(function($id) {
+            ServiceLocatorTagPass::register($container, array_map(static function ($id) {
                 return new Reference($id);
             }, $connections)),
             $defaultConnection,
@@ -76,12 +76,12 @@ class DoctrineDBALExtension extends Extension
     }
 
         /**
-     * Loads a configured DBAL connection.
-     *
-     * @param string           $name       The name of the connection
-     * @param array            $connection A dbal connection configuration.
-     * @param ContainerBuilder $container  A ContainerBuilder instance
-     */
+         * Loads a configured DBAL connection.
+         *
+         * @param string           $name       The name of the connection
+         * @param array            $connection A dbal connection configuration.
+         * @param ContainerBuilder $container  A ContainerBuilder instance
+         */
     protected function loadDbalConnection($name, array $connection, ContainerBuilder $container)
     {
         $configuration = $container->setDefinition(sprintf('doctrine.dbal.%s_connection.configuration', $name), new ChildDefinition('doctrine.dbal.connection.configuration'));

@@ -49,7 +49,7 @@ class DoctrineDBALDataCollectorTest extends TestCase
         $this->assertSame(1, $groupedQueries['default'][1]['count']);
     }
 
-    private function createCollector(): DoctrineDBALDataCollector
+    private function createCollector() : DoctrineDBALDataCollector
     {
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry
@@ -58,8 +58,6 @@ class DoctrineDBALDataCollectorTest extends TestCase
             ->with('default')
             ->will($this->returnValue($this->createMock(Connection::class)));
 
-        return new DoctrineDBALDataCollector($registry, [
-            'default' => 'doctrine.dbal.default_connection'
-        ]);
+        return new DoctrineDBALDataCollector($registry, ['default' => 'doctrine.dbal.default_connection']);
     }
 }

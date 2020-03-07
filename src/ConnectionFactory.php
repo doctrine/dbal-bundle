@@ -10,9 +10,9 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use const E_USER_DEPRECATED;
 use function get_class;
 use function trigger_error;
-use const E_USER_DEPRECATED;
 
 class ConnectionFactory
 {

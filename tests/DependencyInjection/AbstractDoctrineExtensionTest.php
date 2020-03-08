@@ -9,16 +9,12 @@ use Doctrine\Bundle\DBALBundle\Tests\Fixtures\TestType;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Schema\AbstractAsset;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListenersAndSubscribersPass;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ServiceLocator;
 
 abstract class AbstractDoctrineExtensionTest extends TestCase
 {
@@ -342,36 +338,23 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $this->assertTrue($filter('messenger_messages'));
     }
 
-    private function loadContainer($fixture, array $bundles = ['YamlBundle'], CompilerPassInterface $compilerPass = null)
+    private function loadContainer($fixture)
     {
-        $container = $this->getContainer($bundles);
+        $container = $this->getContainer([]);
         $container->registerExtension(new DoctrineDBALExtension());
 
         $this->loadFromFile($container, $fixture);
-
-        if ($compilerPass !== null) {
-            $container->addCompilerPass($compilerPass);
-        }
-
         $this->compileContainer($container);
 
         return $container;
     }
 
-    private function getContainer(array $bundles)
+    private function getContainer()
     {
-        $map = [];
-
-        foreach ($bundles as $bundle) {
-            require_once __DIR__ . '/Fixtures/Bundles/' . $bundle . '/' . $bundle . '.php';
-
-            $map[$bundle] = 'Fixtures\\Bundles\\' . $bundle . '\\' . $bundle;
-        }
-
         $container = new ContainerBuilder(new ParameterBag([
             'kernel.name' => 'app',
             'kernel.debug' => false,
-            'kernel.bundles' => $map,
+            'kernel.bundles' => [],
             'kernel.cache_dir' => sys_get_temp_dir(),
             'kernel.environment' => 'test',
             'kernel.root_dir' => __DIR__ . '/../../', // src dir
@@ -387,11 +370,6 @@ abstract class AbstractDoctrineExtensionTest extends TestCase
         $container->setDefinition('cache.app', (new Definition(ArrayAdapter::class))->setPublic(true));
 
         return $container;
-    }
-
-    private function assertDICConstructorArguments(Definition $definition, $args)
-    {
-        $this->assertEquals($args, $definition->getArguments(), "Expected and actual DIC Service constructor arguments of definition '" . $definition->getClass() . "' don't match.");
     }
 
     /**

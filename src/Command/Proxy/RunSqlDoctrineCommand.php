@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class RunSqlDoctrineCommand extends RunSqlCommand
 {
-    use ConnectionHelperTrait;
+    use ApplicationConnectionHelper;
 
     /**
      * {@inheritDoc}

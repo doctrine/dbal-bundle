@@ -1,0 +1,6 @@
+doctrine_dbal:
+    default_connection: default
+    types:
+        test: Doctrine\Bundle\DBALBundle\Tests\Fixtures\TestType
+    connections:
+        default: ~

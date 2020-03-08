@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xsd:schema xmlns="http://symfony.com/schema/dic/doctrine_dbal"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://symfony.com/schema/dic/doctrine_dbal"
+    elementFormDefault="qualified">
+
+    <xsd:element name="config">
+        <xsd:complexType>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                <xsd:element name="connection" type="connection" />
+                <xsd:element name="type" type="named_scalar" />
+                <xsd:group ref="connection-child-config" />
+            </xsd:choice>
+
+            <xsd:attribute name="default-connection" type="xsd:string" />
+            <xsd:attributeGroup ref="connection-config" />
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="named_scalar">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="connection-config">
+        <xsd:attribute name="driver" type="xsd:string" />
+        <xsd:attribute name="driver-class" type="xsd:string" />
+        <xsd:attribute name="wrapper-class" type="xsd:string" />
+        <xsd:attribute name="keep-slave" type="xsd:string" />
+        <xsd:attribute name="platform-service" type="xsd:string" />
+        <xsd:attribute name="shard-choser" type="xsd:string" />
+        <xsd:attribute name="shard-choser-service" type="xsd:string" />
+        <xsd:attribute name="auto-commit" type="xsd:string" />
+        <xsd:attribute name="schema-filter" type="xsd:string" />
+        <xsd:attribute name="logging" type="xsd:string" default="false" />
+        <xsd:attribute name="profiling" type="xsd:string" default="false" />
+        <xsd:attribute name="profiling-collect-backtrace" type="xsd:string" default="false" />
+        <xsd:attribute name="server-version" type="xsd:string" />
+        <xsd:attribute name="use-savepoints" type="xsd:boolean" />
+        <xsd:attributeGroup ref="driver-config" />
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="driver-config">
+        <xsd:attribute name="url" type="xsd:string" />
+        <xsd:attribute name="dbname" type="xsd:string" />
+        <xsd:attribute name="host" type="xsd:string" />
+        <xsd:attribute name="port" type="xsd:string" />
+        <xsd:attribute name="user" type="xsd:string" />
+        <xsd:attribute name="password" type="xsd:string" />
+        <xsd:attribute name="application-name" type="xsd:string" />
+        <xsd:attribute name="path" type="xsd:string" />
+        <xsd:attribute name="unix-socket" type="xsd:string" />
+        <xsd:attribute name="memory" type="xsd:string" />
+        <xsd:attribute name="charset" type="xsd:string" />
+        <xsd:attribute name="persistent" type="xsd:string" />
+        <xsd:attribute name="protocol" type="xsd:string" />
+        <xsd:attribute name="server" type="xsd:string" />
+        <xsd:attribute name="service" type="xsd:string" />
+        <xsd:attribute name="servicename" type="xsd:string" />
+        <xsd:attribute name="session-mode" type="xsd:string" />
+        <xsd:attribute name="default_dbname" type="xsd:string" />
+        <xsd:attribute name="sslmode" type="xsd:string" />
+        <xsd:attribute name="sslrootcert" type="xsd:string" />
+        <xsd:attribute name="sslcert" type="xsd:string" />
+        <xsd:attribute name="sslkey" type="xsd:string" />
+        <xsd:attribute name="sslcrl" type="xsd:string" />
+        <xsd:attribute name="pooled" type="xsd:string" />
+        <xsd:attribute name="multiple-active-result-sets" type="xsd:string" />
+        <xsd:attribute name="connectstring" type="xsd:string" />
+        <xsd:attribute name="instancename" type="xsd:string" />
+    </xsd:attributeGroup>
+
+    <xsd:group name="connection-child-config">
+        <xsd:choice>
+            <xsd:element name="option" type="option" />
+            <xsd:element name="mapping-type" type="named_scalar" />
+            <xsd:element name="slave" type="slave" />
+            <xsd:element name="shard" type="shard" />
+            <xsd:element name="default-table-option" type="named_scalar" />
+        </xsd:choice>
+    </xsd:group>
+
+    <xsd:complexType name="option">
+        <xsd:complexContent>
+            <xsd:extension base="xsd:anyType">
+                <xsd:attribute name="key" type="xsd:string" use="required" />
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="connection">
+        <xsd:group ref="connection-child-config" minOccurs="0" maxOccurs="unbounded" />
+
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attributeGroup ref="connection-config" />
+    </xsd:complexType>
+
+    <xsd:complexType name="slave">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+        <xsd:attributeGroup ref="driver-config" />
+    </xsd:complexType>
+
+    <xsd:complexType name="shard">
+        <xsd:attribute name="id" type="xsd:integer" use="required" />
+        <xsd:attributeGroup ref="driver-config" />
+    </xsd:complexType>
+
+</xsd:schema>

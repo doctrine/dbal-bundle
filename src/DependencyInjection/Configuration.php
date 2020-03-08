@@ -28,10 +28,7 @@ class Configuration implements ConfigurationInterface
 
         return $treeBuilder;
     }
-
-    /**
-     * Add DBAL section to configuration tree
-     */
+    
     private function addDbalSection(ArrayNodeDefinition $node)
     {
         $node

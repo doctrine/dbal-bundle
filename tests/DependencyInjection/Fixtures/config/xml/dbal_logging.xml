@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/doctrine_dbal"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine_dbal http://symfony.com/schema/dic/doctrine_dbal/doctrine_dbal-1.0.xsd">
+
+    <config default-connection="mysql">
+        <connection
+            name="log"
+            logging="true"
+            profiling="false" />
+        <connection
+            name="profile"
+            logging="false"
+            profiling="true" />
+        <connection
+            name="profile_with_backtrace"
+            logging="false"
+            profiling="true"
+            profiling-collect-backtrace="true" />
+        <connection
+            name="backtrace_without_profile"
+            logging="false"
+            profiling="false"
+            profiling-collect-backtrace="true" />
+        <connection
+            name="both"
+            logging="true"
+            profiling="true" />
+        <connection
+            name="none"
+            logging="false"
+            profiling="false" />
+    </config>
+</srv:container>

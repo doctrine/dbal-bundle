@@ -2,7 +2,7 @@
 
 namespace Doctrine\Bundle\DBALBundle\DependencyInjection;
 
-use Doctrine\Bundle\DBALBundle\DBAL\RegexSchemaAssetFilter;
+use Doctrine\Bundle\DBALBundle\DBAL\SchemaFilter\RegexSchemaAssetFilter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -278,5 +278,21 @@ class DoctrineDBALExtension extends Extension
         }
 
         return $options;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getXsdValidationBasePath() : string
+    {
+        return __DIR__ . '/../Resources/config/schema';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getNamespace() : string
+    {
+        return 'http://symfony.com/schema/dic/doctrine_dbal';
     }
 }

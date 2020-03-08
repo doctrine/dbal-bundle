@@ -39,7 +39,7 @@ class Psr11ConnectionRegistry implements ConnectionRegistry
      */
     public function getConnection(?string $name = null) : Connection
     {
-        return $this->container->get($name !== null ? $name : $this->defaultConnectionName);
+        return $this->container->get($name ?? $this->defaultConnectionName);
     }
 
     /**

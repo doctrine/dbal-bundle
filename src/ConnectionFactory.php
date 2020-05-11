@@ -32,7 +32,7 @@ class ConnectionFactory
     /**
      * Create a connection by name.
      *
-     * @param mixed[] $params
+     * @param mixed[]         $params
      * @param string[]|Type[] $mappingTypes
      *
      * @return Connection
@@ -43,29 +43,29 @@ class ConnectionFactory
         EventManager $eventManager = null,
         array $mappingTypes = []
     ) {
-        if (!$this->initialized) {
+        if (! $this->initialized) {
             $this->initializeTypes();
         }
 
-        if (!isset($params['pdo']) && !isset($params['charset'])) {
+        if (! isset($params['pdo']) && ! isset($params['charset'])) {
             $wrapperClass = null;
             if (isset($params['wrapperClass'])) {
-                if (!is_subclass_of($params['wrapperClass'], Connection::class)) {
+                if (! is_subclass_of($params['wrapperClass'], Connection::class)) {
                     throw DBALException::invalidWrapperClass($params['wrapperClass']);
                 }
 
-                $wrapperClass = $params['wrapperClass'];
+                $wrapperClass           = $params['wrapperClass'];
                 $params['wrapperClass'] = null;
             }
 
             $connection = DriverManager::getConnection($params, $config, $eventManager);
-            $params = $connection->getParams();
-            $driver = $connection->getDriver();
+            $params     = $connection->getParams();
+            $driver     = $connection->getDriver();
 
             if ($driver instanceof AbstractMySQLDriver) {
                 $params['charset'] = 'utf8mb4';
 
-                if (!isset($params['defaultTableOptions']['collate'])) {
+                if (! isset($params['defaultTableOptions']['collate'])) {
                     $params['defaultTableOptions']['collate'] = 'utf8mb4_unicode_ci';
                 }
             } else {
@@ -83,7 +83,7 @@ class ConnectionFactory
             $connection = DriverManager::getConnection($params, $config, $eventManager);
         }
 
-        if (!empty($mappingTypes)) {
+        if (! empty($mappingTypes)) {
             $platform = $this->getDatabasePlatform($connection);
             foreach ($mappingTypes as $dbType => $doctrineType) {
                 $platform->registerDoctrineTypeMapping($dbType, $doctrineType);
@@ -102,7 +102,7 @@ class ConnectionFactory
      *
      * @throws DBALException
      */
-    private function getDatabasePlatform(Connection $connection): AbstractPlatform
+    private function getDatabasePlatform(Connection $connection) : AbstractPlatform
     {
         try {
             return $connection->getDatabasePlatform();
@@ -121,7 +121,7 @@ class ConnectionFactory
     /**
      * initialize the types
      */
-    private function initializeTypes(): void
+    private function initializeTypes() : void
     {
         foreach ($this->typesConfig as $typeName => $typeConfig) {
             if (Type::hasType($typeName)) {

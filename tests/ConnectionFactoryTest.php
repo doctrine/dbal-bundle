@@ -18,15 +18,15 @@ class ConnectionFactoryTest extends TestCase
     /**
      * @expectedException \Doctrine\DBAL\DBALException
      */
-    public function testContainer(): void
+    public function testContainer() : void
     {
-        $typesConfig = [];
-        $factory = new ConnectionFactory($typesConfig);
-        $params = ['driverClass' => FakeDriver::class];
-        $config = null;
+        $typesConfig  = [];
+        $factory      = new ConnectionFactory($typesConfig);
+        $params       = ['driverClass' => FakeDriver::class];
+        $config       = null;
         $eventManager = null;
         $mappingTypes = [0];
-        $exception = new DriverException('', $this->createMock(Driver\AbstractDriverException::class));
+        $exception    = new DriverException('', $this->createMock(Driver\AbstractDriverException::class));
 
         // put the mock into the fake driver
         FakeDriver::$exception = $exception;
@@ -41,26 +41,26 @@ class ConnectionFactoryTest extends TestCase
         }
     }
 
-    public function testDefaultCharset(): void
+    public function testDefaultCharset() : void
     {
         $factory = new ConnectionFactory([]);
-        $params = [
+        $params  = [
             'driverClass' => FakeDriver::class,
             'wrapperClass' => FakeConnection::class,
         ];
 
         $creationCount = FakeConnection::$creationCount;
-        $connection = $factory->createConnection($params);
+        $connection    = $factory->createConnection($params);
 
         $this->assertInstanceof(FakeConnection::class, $connection);
         $this->assertSame('utf8', $connection->getParams()['charset']);
         $this->assertSame(1 + $creationCount, FakeConnection::$creationCount);
     }
 
-    public function testDefaultCharsetMySql(): void
+    public function testDefaultCharsetMySql() : void
     {
         $factory = new ConnectionFactory([]);
-        $params = ['driver' => 'pdo_mysql'];
+        $params  = ['driver' => 'pdo_mysql'];
 
         $connection = $factory->createConnection($params);
 
@@ -92,7 +92,7 @@ class FakeDriver implements Driver
      *
      * @link https://github.com/doctrine/DoctrineBundle/issues/673
      */
-    public function getDatabasePlatform(): AbstractPlatform
+    public function getDatabasePlatform() : AbstractPlatform
     {
         if (self::$exception !== null) {
             throw self::$exception;
@@ -104,27 +104,27 @@ class FakeDriver implements Driver
     // ----- below this line follow only dummy methods to satisfy the interface requirements ----
 
     /**
-     * @param mixed[] $params
+     * @param mixed[]     $params
      * @param string|null $username
      * @param string|null $password
-     * @param mixed[] $driverOptions
+     * @param mixed[]     $driverOptions
      */
-    public function connect(array $params, $username = null, $password = null, array $driverOptions = []): void
+    public function connect(array $params, $username = null, $password = null, array $driverOptions = []) : void
     {
         throw new Exception('not implemented');
     }
 
-    public function getSchemaManager(Connection $conn): void
+    public function getSchemaManager(Connection $conn) : void
     {
         throw new Exception('not implemented');
     }
 
-    public function getName(): string
+    public function getName() : string
     {
         return 'FakeDriver';
     }
 
-    public function getDatabase(Connection $conn): string
+    public function getDatabase(Connection $conn) : string
     {
         return 'fake_db';
     }

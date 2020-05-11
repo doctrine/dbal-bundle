@@ -3,6 +3,7 @@
 namespace Doctrine\Bundle\DBALBundle;
 
 use Doctrine\DBAL\Connection;
+use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 
 class Psr11ConnectionRegistry implements ConnectionRegistry
@@ -39,7 +40,13 @@ class Psr11ConnectionRegistry implements ConnectionRegistry
      */
     public function getConnection(?string $name = null) : Connection
     {
-        return $this->container->get($name ?? $this->defaultConnectionName);
+        $name = $name ?? $this->defaultConnectionName;
+
+        if (! $this->container->has($name)) {
+            throw new InvalidArgumentException(sprintf('Connection with name "%s" does not exist.', $name));
+        }
+
+        return $this->container->get($name);
     }
 
     /**

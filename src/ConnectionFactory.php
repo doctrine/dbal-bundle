@@ -6,13 +6,12 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use const E_USER_DEPRECATED;
-use function get_class;
-use function trigger_error;
+use function is_subclass_of;
 
 class ConnectionFactory
 {
@@ -33,28 +32,62 @@ class ConnectionFactory
     /**
      * Create a connection by name.
      *
-     * @param mixed[]         $params
+     * @param mixed[] $params
      * @param string[]|Type[] $mappingTypes
      *
      * @return Connection
      */
-    public function createConnection(array $params, Configuration $config = null, EventManager $eventManager = null, array $mappingTypes = [])
-    {
-        if (! $this->initialized) {
+    public function createConnection(
+        array $params,
+        Configuration $config = null,
+        EventManager $eventManager = null,
+        array $mappingTypes = []
+    ) {
+        if (!$this->initialized) {
             $this->initializeTypes();
         }
 
-        $connection = DriverManager::getConnection($params, $config, $eventManager);
+        if (!isset($params['pdo']) && !isset($params['charset'])) {
+            $wrapperClass = null;
+            if (isset($params['wrapperClass'])) {
+                if (!is_subclass_of($params['wrapperClass'], Connection::class)) {
+                    throw DBALException::invalidWrapperClass($params['wrapperClass']);
+                }
 
-        if (! empty($mappingTypes)) {
+                $wrapperClass = $params['wrapperClass'];
+                $params['wrapperClass'] = null;
+            }
+
+            $connection = DriverManager::getConnection($params, $config, $eventManager);
+            $params = $connection->getParams();
+            $driver = $connection->getDriver();
+
+            if ($driver instanceof AbstractMySQLDriver) {
+                $params['charset'] = 'utf8mb4';
+
+                if (!isset($params['defaultTableOptions']['collate'])) {
+                    $params['defaultTableOptions']['collate'] = 'utf8mb4_unicode_ci';
+                }
+            } else {
+                $params['charset'] = 'utf8';
+            }
+
+            if ($wrapperClass !== null) {
+                $params['wrapperClass'] = $wrapperClass;
+            } else {
+                $wrapperClass = Connection::class;
+            }
+
+            $connection = new $wrapperClass($params, $driver, $config, $eventManager);
+        } else {
+            $connection = DriverManager::getConnection($params, $config, $eventManager);
+        }
+
+        if (!empty($mappingTypes)) {
             $platform = $this->getDatabasePlatform($connection);
             foreach ($mappingTypes as $dbType => $doctrineType) {
                 $platform->registerDoctrineTypeMapping($dbType, $doctrineType);
             }
-        }
-
-        if (! empty($this->typesConfig)) {
-            $this->markTypesCommented($this->getDatabasePlatform($connection));
         }
 
         return $connection;
@@ -67,11 +100,9 @@ class ConnectionFactory
      * and the platform version is unknown.
      * For details have a look at DoctrineBundle issue #673.
      *
-     * @return AbstractPlatform
-     *
      * @throws DBALException
      */
-    private function getDatabasePlatform(Connection $connection)
+    private function getDatabasePlatform(Connection $connection): AbstractPlatform
     {
         try {
             return $connection->getDatabasePlatform();
@@ -90,7 +121,7 @@ class ConnectionFactory
     /**
      * initialize the types
      */
-    private function initializeTypes()
+    private function initializeTypes(): void
     {
         foreach ($this->typesConfig as $typeName => $typeConfig) {
             if (Type::hasType($typeName)) {
@@ -101,73 +132,5 @@ class ConnectionFactory
         }
 
         $this->initialized = true;
-    }
-
-    private function markTypesCommented(AbstractPlatform $platform) : void
-    {
-        foreach ($this->typesConfig as $typeName => $typeConfig) {
-            $type                   = Type::getType($typeName);
-            $requiresSQLCommentHint = $type->requiresSQLCommentHint($platform);
-
-            // Attribute is missing, make sure a type that doesn't require a comment is marked as commented
-            // This is deprecated behaviour that will be dropped in 2.0.
-            if ($typeConfig['commented'] === null) {
-                if (! $requiresSQLCommentHint) {
-                    @trigger_error(
-                        sprintf(
-                            'The type "%s" was implicitly marked as commented due to the configuration. This is deprecated and will be removed in DoctrineBundle 2.0. Either set the "commented" attribute in the configuration to "false" or mark the type as commented in "%s::requiresSQLCommentHint()."',
-                            $typeName,
-                            get_class($type)
-                        ),
-                        E_USER_DEPRECATED
-                    );
-
-                    $platform->markDoctrineTypeCommented($type);
-                }
-
-                continue;
-            }
-
-            // The following logic generates appropriate deprecation notices telling the user how to update their type configuration.
-            if ($typeConfig['commented']) {
-                if (! $requiresSQLCommentHint) {
-                    @trigger_error(
-                        sprintf(
-                            'The type "%s" was marked as commented in its configuration but not in the type itself. This is deprecated and will be removed in DoctrineBundle 2.0. Please update the return value of "%s::requiresSQLCommentHint()."',
-                            $typeName,
-                            get_class($type)
-                        ),
-                        E_USER_DEPRECATED
-                    );
-
-                    $platform->markDoctrineTypeCommented($type);
-
-                    continue;
-                }
-
-                @trigger_error(
-                    sprintf(
-                        'The type "%s" was explicitly marked as commented in its configuration. This is no longer necessary and will be removed in DoctrineBundle 2.0. Please remove the "commented" attribute from the type configuration.',
-                        $typeName
-                    ),
-                    E_USER_DEPRECATED
-                );
-
-                continue;
-            }
-
-            if (! $requiresSQLCommentHint) {
-                continue;
-            }
-
-            @trigger_error(
-                sprintf(
-                    'The type "%s" was marked as uncommented in its configuration but commented in the type itself. This is deprecated and will be removed in DoctrineBundle 2.0. Please update the return value of "%s::requiresSQLCommentHint()" or remove the "commented" attribute from the type configuration.',
-                    $typeName,
-                    get_class($type)
-                ),
-                E_USER_DEPRECATED
-            );
-        }
     }
 }

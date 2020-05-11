@@ -3,8 +3,8 @@
 namespace Doctrine\Bundle\DBALBundle\Tests;
 
 use Doctrine\Bundle\DBALBundle\ConnectionFactory;
-use Doctrine\Bundle\DBALBundle\Tests\Fixtures\TestCommentedType;
-use Doctrine\Bundle\DBALBundle\Tests\Fixtures\TestType;
+use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Exception\DriverException;
@@ -18,15 +18,15 @@ class ConnectionFactoryTest extends TestCase
     /**
      * @expectedException \Doctrine\DBAL\DBALException
      */
-    public function testContainer()
+    public function testContainer(): void
     {
-        $typesConfig  = [];
-        $factory      = new ConnectionFactory($typesConfig);
-        $params       = ['driverClass' => FakeDriver::class];
-        $config       = null;
+        $typesConfig = [];
+        $factory = new ConnectionFactory($typesConfig);
+        $params = ['driverClass' => FakeDriver::class];
+        $config = null;
         $eventManager = null;
         $mappingTypes = [0];
-        $exception    = new DriverException('', $this->createMock(Driver\AbstractDriverException::class));
+        $exception = new DriverException('', $this->createMock(Driver\AbstractDriverException::class));
 
         // put the mock into the fake driver
         FakeDriver::$exception = $exception;
@@ -41,110 +41,30 @@ class ConnectionFactoryTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getValidTypeConfigurations
-     */
-    public function testRegisterTypes(array $type, int $expectedCalls) : void
+    public function testDefaultCharset(): void
     {
-        $factory      = new ConnectionFactory(['test' => $type]);
-        $params       = ['driverClass' => FakeDriver::class];
-        $config       = null;
-        $eventManager = null;
-        $mappingTypes = [];
-
-        $platform = $this->createMock(AbstractPlatform::class);
-        $platform
-            ->expects($this->exactly($expectedCalls))
-            ->method('markDoctrineTypeCommented')
-            ->with($this->isInstanceOf($type['class']));
-
-        FakeDriver::$platform = $platform;
-
-        try {
-            $factory->createConnection($params, $config, $eventManager, $mappingTypes);
-        } finally {
-            FakeDriver::$platform = null;
-        }
-    }
-
-    public static function getValidTypeConfigurations() : array
-    {
-        return [
-            'uncommentedTypeMarkedNotCommented' => [
-                'type' => [
-                    'class' => TestType::class,
-                    'commented' => false,
-                ],
-                'expectedCalls' => 0,
-            ],
-            'commentedTypeNotMarked' => [
-                'type' => [
-                    'class' => TestCommentedType::class,
-                    'commented' => null,
-                ],
-                'expectedCalls' => 0,
-            ],
+        $factory = new ConnectionFactory([]);
+        $params = [
+            'driverClass' => FakeDriver::class,
+            'wrapperClass' => FakeConnection::class,
         ];
+
+        $creationCount = FakeConnection::$creationCount;
+        $connection = $factory->createConnection($params);
+
+        $this->assertInstanceof(FakeConnection::class, $connection);
+        $this->assertSame('utf8', $connection->getParams()['charset']);
+        $this->assertSame(1 + $creationCount, FakeConnection::$creationCount);
     }
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The type "test" was implicitly marked as commented due to the configuration. This is deprecated and will be removed in DoctrineBundle 2.0. Either set the "commented" attribute in the configuration to "false" or mark the type as commented in "Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType::requiresSQLCommentHint()."
-     */
-    public function testRegisterUncommentedTypeNotMarked() : void
+    public function testDefaultCharsetMySql(): void
     {
-        $this->testRegisterTypes(
-            [
-                'class' => TestType::class,
-                'commented' => null,
-            ],
-            1
-        );
-    }
+        $factory = new ConnectionFactory([]);
+        $params = ['driver' => 'pdo_mysql'];
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The type "test" was marked as commented in its configuration but not in the type itself. This is deprecated and will be removed in DoctrineBundle 2.0. Please update the return value of "Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestType::requiresSQLCommentHint()."
-     */
-    public function testRegisterUncommentedTypeMarkedCommented() : void
-    {
-        $this->testRegisterTypes(
-            [
-                'class' => TestType::class,
-                'commented' => true,
-            ],
-            1
-        );
-    }
+        $connection = $factory->createConnection($params);
 
-    /**
-     * @group legacy
-     * @expectedDeprecation The type "test" was explicitly marked as commented in its configuration. This is no longer necessary and will be removed in DoctrineBundle 2.0. Please remove the "commented" attribute from the type configuration.
-     */
-    public function testRegisterCommentedTypeMarkedCommented() : void
-    {
-        $this->testRegisterTypes(
-            [
-                'class' => TestCommentedType::class,
-                'commented' => true,
-            ],
-            0
-        );
-    }
-
-    /**
-     * @group legacy
-     * @expectedDeprecation The type "test" was marked as uncommented in its configuration but commented in the type itself. This is deprecated and will be removed in DoctrineBundle 2.0. Please update the return value of "Doctrine\Bundle\DoctrineBundle\Tests\DependencyInjection\TestCommentedType::requiresSQLCommentHint()" or remove the "commented" attribute from the type configuration.
-     */
-    public function testRegisterCommentedTypeMarkedNotCommented() : void
-    {
-        $this->testRegisterTypes(
-            [
-                'class' => TestCommentedType::class,
-                'commented' => false,
-            ],
-            0
-        );
+        $this->assertSame('utf8mb4', $connection->getParams()['charset']);
     }
 }
 
@@ -172,7 +92,7 @@ class FakeDriver implements Driver
      *
      * @link https://github.com/doctrine/DoctrineBundle/issues/673
      */
-    public function getDatabasePlatform()
+    public function getDatabasePlatform(): AbstractPlatform
     {
         if (self::$exception !== null) {
             throw self::$exception;
@@ -184,28 +104,45 @@ class FakeDriver implements Driver
     // ----- below this line follow only dummy methods to satisfy the interface requirements ----
 
     /**
-     * @param mixed[]     $params
+     * @param mixed[] $params
      * @param string|null $username
      * @param string|null $password
-     * @param mixed[]     $driverOptions
+     * @param mixed[] $driverOptions
      */
-    public function connect(array $params, $username = null, $password = null, array $driverOptions = [])
+    public function connect(array $params, $username = null, $password = null, array $driverOptions = []): void
     {
         throw new Exception('not implemented');
     }
 
-    public function getSchemaManager(Connection $conn)
+    public function getSchemaManager(Connection $conn): void
     {
         throw new Exception('not implemented');
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'FakeDriver';
     }
 
-    public function getDatabase(Connection $conn)
+    public function getDatabase(Connection $conn): string
     {
         return 'fake_db';
+    }
+}
+
+class FakeConnection extends Connection
+{
+    /** @var int */
+    public static $creationCount = 0;
+
+    public function __construct(
+        array $params,
+        FakeDriver $driver,
+        ?Configuration $config = null,
+        ?EventManager $eventManager = null
+    ) {
+        ++self::$creationCount;
+
+        parent::__construct($params, $driver, $config, $eventManager);
     }
 }

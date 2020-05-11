@@ -2,7 +2,9 @@
 
 namespace Doctrine\Bundle\DBALBundle\Command\Proxy;
 
-use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand;
+use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand as DoctrineRunSqlCommand;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,10 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Execute a SQL query and output the results.
  */
-class RunSqlDoctrineCommand extends RunSqlCommand
+class RunSqlCommand extends DoctrineRunSqlCommand
 {
-    use ApplicationConnectionHelper;
-
     /**
      * {@inheritDoc}
      */
@@ -41,5 +41,12 @@ EOT
         $this->setConnectionHelper($this->getApplication(), $input->getOption('connection'));
 
         return parent::execute($input, $output);
+    }
+
+    private function setConnectionHelper(Application $application, ?string $connectionName)
+    {
+        $connection = $application->getKernel()->getContainer()->get('doctrine.dbal.connection_registry')->getConnection($connectionName);
+        $helperSet  = $application->getHelperSet();
+        $helperSet->set(new ConnectionHelper($connection), 'db');
     }
 }

@@ -31,22 +31,23 @@ abstract class ContainerTestCase extends BaseTestCase
 
         $extension = new DoctrineDBALExtension();
         $container->registerExtension($extension);
-        $extension->load([[
-            'connections' => [
-                'default' => [
-                    'driver' => 'pdo_mysql',
-                    'charset' => 'UTF8',
-                    'platform-service' => 'my.platform',
+        $extension->load([
+            [
+                'connections' => [
+                    'default' => [
+                        'driver' => 'pdo_mysql',
+                        'charset' => 'UTF8',
+                        'platform-service' => 'my.platform',
+                    ],
+                ],
+                'default_connection' => 'default',
+                'types' => [
+                    'test' => [
+                        'class' => TestType::class,
+                        'commented' => false,
+                    ],
                 ],
             ],
-            'default_connection' => 'default',
-            'types' => [
-                'test' => [
-                    'class' => TestType::class,
-                    'commented' => false,
-                ],
-            ],
-        ],
         ], $container);
 
         $container->setDefinition('my.platform', new Definition('Doctrine\DBAL\Platforms\MySqlPlatform'))->setPublic(true);

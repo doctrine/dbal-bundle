@@ -87,6 +87,6 @@ class ProfilerTest extends BaseTestCase
         ]);
 
         $output = str_replace(["\e[37m", "\e[0m", "\e[32;1m", "\e[34;1m"], '', $output);
-        $this->assertContains("SELECT * FROM foo WHERE bar IN ('foo', 'bar');", $output);
+        $this->assertStringContainsString("SELECT * FROM foo WHERE bar IN ('foo', 'bar');", $output);
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\Bundle\DBALBundle\ConnectionFactory;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -15,11 +16,10 @@ use PHPUnit\Framework\TestCase;
 
 class ConnectionFactoryTest extends TestCase
 {
-    /**
-     * @expectedException \Doctrine\DBAL\DBALException
-     */
     public function testContainer() : void
     {
+        $this->expectException(DBALException::class);
+        
         $typesConfig  = [];
         $factory      = new ConnectionFactory($typesConfig);
         $params       = ['driverClass' => FakeDriver::class];

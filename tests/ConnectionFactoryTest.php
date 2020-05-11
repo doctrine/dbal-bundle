@@ -19,7 +19,7 @@ class ConnectionFactoryTest extends TestCase
     public function testContainer() : void
     {
         $this->expectException(DBALException::class);
-        
+
         $typesConfig  = [];
         $factory      = new ConnectionFactory($typesConfig);
         $params       = ['driverClass' => FakeDriver::class];

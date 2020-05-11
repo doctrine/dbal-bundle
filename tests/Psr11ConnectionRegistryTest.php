@@ -6,7 +6,7 @@ use Doctrine\Bundle\DBALBundle\ConnectionRegistry;
 use Doctrine\Bundle\DBALBundle\Psr11ConnectionRegistry;
 use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -15,15 +15,15 @@ class Psr11ConnectionRegistryTest extends TestCase
     /** @var ConnectionRegistry */
     private $registry;
 
-    /** @var array<string, Connection&Stub> */
+    /** @var array<string, Connection&MockObject> */
     private $connections;
 
     protected function setUp() : void
     {
-        /** @var Connection&Stub $fooConnection */
-        $fooConnection = $this->createStub(Connection::class);
-        /** @var Connection&Stub $barConnection */
-        $barConnection = $this->createStub(Connection::class);
+        /** @var Connection&MockObject $fooConnection */
+        $fooConnection = $this->createMock(Connection::class);
+        /** @var Connection&MockObject $barConnection */
+        $barConnection = $this->createMock(Connection::class);
 
         $this->connections = [
             'foo' => $fooConnection,

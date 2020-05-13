@@ -76,14 +76,14 @@ class DoctrineDBALExtension extends Extension
             array_keys($connections),
         ]);
 
-        if (class_exists(ConnectionProvider::class)) {
-            // dbal >= 2.11
-            $container->register('doctrine.dbal.cli.connection_provider', ConnectionProviderAdapter::class)
-                ->setArguments([new Reference('doctrine.dbal.connection_registry')]);
-            $container->findDefinition('doctrine.query_sql_command')->setArguments([
-                new Reference('doctrine.dbal.cli.connection_provider')
-            ]);
+        if (! class_exists(ConnectionProvider::class)) {
+            return;
         }
+
+        // dbal >= 2.11
+        $container->register('doctrine.dbal.cli.connection_provider', ConnectionProviderAdapter::class)
+            ->setArguments([new Reference('doctrine.dbal.connection_registry')]);
+        $container->findDefinition('doctrine.query_sql_command')->setArguments([new Reference('doctrine.dbal.cli.connection_provider')]);
     }
 
         /**

@@ -8,9 +8,7 @@ use Doctrine\DBAL\Tools\Console\ConnectionProvider;
 
 final class ConnectionProviderAdapter implements ConnectionProvider
 {
-    /**
-     * @var ConnectionRegistry
-     */
+    /** @var ConnectionRegistry */
     private $registry;
 
     public function __construct(ConnectionRegistry $registry)
@@ -18,12 +16,12 @@ final class ConnectionProviderAdapter implements ConnectionProvider
         $this->registry = $registry;
     }
 
-    public function getDefaultConnection(): Connection
+    public function getDefaultConnection() : Connection
     {
         return $this->registry->getConnection();
     }
 
-    public function getConnection(string $name): Connection
+    public function getConnection(string $name) : Connection
     {
         return $this->registry->getConnection($name);
     }

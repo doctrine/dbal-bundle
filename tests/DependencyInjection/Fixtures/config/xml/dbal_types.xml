@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/doctrine_dbal"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/doctrine_dbal http://symfony.com/schema/dic/doctrine_dbal/doctrine_dbal-1.0.xsd">
+
+    <config default-connection="default">
+        <type name="test">Doctrine\Bundle\DBALBundle\Tests\Fixtures\TestType</type>
+        <connection name="default" />
+    </config>
+</srv:container>

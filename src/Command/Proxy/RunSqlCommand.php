@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class RunSqlCommand extends DoctrineRunSqlCommand
 {
     /**
-     * no type-hint for BC compatibility with dbal < 2.11
+     * no type-hint for BC with dbal < 2.11
      */
     public function __construct($connectionProvider = null)
     {
@@ -43,7 +43,7 @@ EOT
             return;
         }
 
-        // BC compatibility with dbal < 2.11
+        // BC with dbal < 2.11
         $this->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command');
     }
 
@@ -52,7 +52,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // BC compatibility with dbal < 2.11
+        // BC with dbal < 2.11
         $this->setConnectionHelper($this->getApplication(), $input->getOption('connection'));
 
         return parent::execute($input, $output);

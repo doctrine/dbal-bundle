@@ -12,8 +12,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Execute a SQL query and output the results.
  */
-class RunSqlCommand extends DoctrineRunSqlCommand
+final class RunSqlCommand extends DoctrineRunSqlCommand
 {
+    // no type-hint for BC compatibility with dbal < 2.11
+    public function __construct($connectionProvider = null)
+    {
+        parent::__construct($connectionProvider);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -23,14 +29,18 @@ class RunSqlCommand extends DoctrineRunSqlCommand
 
         $this
             ->setName('doctrine:query:sql')
-            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes the given SQL query and
 outputs the results:
 
 <info>php %command.full_name% "SELECT * FROM users"</info>
 EOT
-        );
+            );
+
+        if (!$this->getDefinition()->hasOption('connection')) {
+            // BC compatibility with dbal < 2.11
+            $this->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command');
+        }
     }
 
     /**
@@ -38,6 +48,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // BC compatibility with dbal < 2.11
         $this->setConnectionHelper($this->getApplication(), $input->getOption('connection'));
 
         return parent::execute($input, $output);

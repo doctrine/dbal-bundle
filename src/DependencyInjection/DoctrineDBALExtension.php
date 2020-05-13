@@ -2,7 +2,9 @@
 
 namespace Doctrine\Bundle\DBALBundle\DependencyInjection;
 
+use Doctrine\Bundle\DBALBundle\Command\Proxy\ConnectionProviderAdapter;
 use Doctrine\Bundle\DBALBundle\DBAL\SchemaFilter\RegexSchemaAssetFilter;
+use Doctrine\DBAL\Tools\Console\ConnectionProvider;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -73,6 +75,15 @@ class DoctrineDBALExtension extends Extension
             $defaultConnection,
             array_keys($connections),
         ]);
+
+        if (class_exists(ConnectionProvider::class)) {
+            // dbal >= 2.11
+            $container->register('doctrine.dbal.cli.connection_provider', ConnectionProviderAdapter::class)
+                ->setArguments([new Reference('doctrine.dbal.connection_registry')]);
+            $container->findDefinition('doctrine.query_sql_command')->setArguments([
+                new Reference('doctrine.dbal.cli.connection_provider')
+            ]);
+        }
     }
 
         /**
